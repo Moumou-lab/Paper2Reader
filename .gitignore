@@ -1,4 +1,9 @@
 
 
+# 忽略 Python 缓存文件和编译文件
+__pycache__/
+*.py[cod]
+
+
 # 忽略 config.py 文件
 /agents/config.py
