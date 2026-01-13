@@ -1,9 +1,33 @@
-
-
 # 忽略 Python 缓存文件和编译文件
 __pycache__/
 *.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
 
-
-# 忽略 config.py 文件
+# 忽略配置文件（包含敏感信息）
 /agents/config.py
+
+# 忽略论文文件目录（用户自己的论文）
+/papers/
+
+# 忽略输出目录（生成的笔记）
+/outputs/
+
+# 忽略 IDE 和编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 忽略环境文件
+.env
+.venv
+venv/
+env/
+
+# 忽略系统文件
+.DS_Store
+Thumbs.db
