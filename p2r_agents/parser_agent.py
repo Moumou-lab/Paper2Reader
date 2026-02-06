@@ -1,5 +1,4 @@
 # 标准导入
-from dataclasses import dataclass
 from agents import (
     Agent,
     ModelSettings,
@@ -22,8 +21,8 @@ class ParserOutput(BaseModel):
     section_content: str | None
     main_contributions: list[str] | None
     methodology: str | None
-    experiments: str | None
-    conclusions: str | None
+    experiments: list[str] | None 
+    conclusions: list[str] | None  
     keywords: list[str] | None
 
     class Config:
@@ -34,5 +33,5 @@ ParserAgent = Agent(
     instructions=parser_prompt(), # 仅做任务定义, 目标 Section 内容, 需要在 User Message 中传入
     model=base_dpsk_model,
     model_settings=base_dpsk_nothink_setting(),
-    output_type=ParserOutput
+    output_type=list[ParserOutput]
 )
