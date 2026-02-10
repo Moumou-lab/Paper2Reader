@@ -3,7 +3,7 @@ Parser Agent 的提示词
 """
 
 
-def parser_prompt() -> str:
+def parser_system_prompt() -> str:
     return """你是一个专业的论文解析助手。
 你的输入会包含：
 1) 当前页 OCR 文本

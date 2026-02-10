@@ -1,24 +1,52 @@
 # 标准导入
-from agents import (
-    Agent,
-    ModelSettings,
-    OpenAIChatCompletionsModel,
-    Runner,
-    function_tool,
-)
+from openai import (
+    OpenAI,
+    AsyncOpenAI,
+    )
 from pydantic import BaseModel
+from typing import Any
+
 # 自定义导入
 from .config import (
-    base_model,
-    base_dpsk_nothink_setting,
-    base_dpsk_think_setting,
+    TEXT_MODEL,
+    base_client,
+    base_dpsk_settings,
 )
-from .prompts.parser_prompt import parser_prompt
+from .prompts.parser_prompt import parser_system_prompt
 
-ParserAgent = Agent(
-    name="论文解析专家",
-    instructions=parser_prompt(), # 仅做任务定义, 目标 Section 内容, 需要在 User Message 中传入
-    model=base_model,
-    model_settings=base_dpsk_nothink_setting(),
-    output_type=str,
-)
+
+class ParserAgent:
+    def __init__(
+        self,
+        model=TEXT_MODEL,
+        client=base_client,
+        _base_settings=base_dpsk_settings(thinking=False),
+    ):
+        self.model = model
+        self.client = client
+        self._base_settings = _base_settings
+
+    def call_response(self, input: str|list[dict]) -> Any:
+        """
+        调用 OpenAI 聊天补全接口并返回单条消息对象。
+        Args:
+            input (str | list[dict])
+        Returns:
+            Any: OpenAI 返回的单条消息对象
+        """
+        if isinstance(input, str):
+           messages=[
+                {"role": "system", "content": parser_system_prompt()},
+                {"role": "user", "content": input},
+            ]
+        elif isinstance(input, list):
+            messages = input
+        else:
+            raise TypeError(f"Invalid input type: {type(input)}")
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            **self._base_settings,  # 展开统一设置
+        )
+        return response.choices[0].message
+

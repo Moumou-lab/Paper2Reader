@@ -5,21 +5,23 @@ from openai import (
     )
 from pydantic import BaseModel
 from typing import Any
+
 # 自定义导入
 from .config import (
     TEXT_MODEL,
+    base_client,
     base_dpsk_settings,
 )
-
 from .prompts.mentor_prompt import mentor_system_prompt
 
-client = OpenAI(
-    base_url="https://api.siliconflow.cn/v1",
-    api_key="sk-nhnklopejonbklumkchlnsjaluxbetocvqdzevgcrjptjlpj",
-)
 
 class MentorAgent:
-    def __init__(self, model=TEXT_MODEL, client=client, _base_settings=base_dpsk_settings(thinking=False)):
+    def __init__(
+        self,
+        model=TEXT_MODEL,
+        client=base_client,
+        _base_settings=base_dpsk_settings(thinking=False),
+    ):
         self.model = model
         self.client = client
         self._base_settings = _base_settings

@@ -4,11 +4,14 @@ from p2r_agents import (
     ParserAgent,
 )
 import asyncio
-from agents import Runner
+
+
 
 async def main():
-    outline_result = await Runner.run(starting_agent=MentorAgent, input="你好, 一句话介绍一下快手")
-    logger.success(outline_result)
+    mentor_test = MentorAgent().call_response("你好, 一句话介绍一下快手")
+    logger.success(mentor_test)
+    parser_test = ParserAgent().call_response("你好, 一句话介绍一下快手")
+    logger.success(parser_test)
 
 if __name__ == "__main__":
     asyncio.run(main())
