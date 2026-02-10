@@ -47,4 +47,4 @@ def extract_pdf_text_from_page(pdf_path: str, target_page: int) -> str:
     # 尝试先直接提取文本
     text = page.get_text().strip()
 
-    return text.strip()
+    return text

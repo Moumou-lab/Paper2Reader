@@ -1,5 +1,5 @@
 # 标准导入
-from tempfile import tempdir
+import json
 from agents import (
     Agent,
     ModelSettings,
@@ -10,41 +10,51 @@ from agents import (
 from typing import List, Dict
 from pathlib import Path
 from loguru import logger
-
+from tqdm import tqdm
 # 自定义导入
 from p2r_agents import (
-    mentor_agent,
+    MentorAgent,
     ParserAgent,
 )
+from p2r_agents.prompts import mentor_outline_prompt, parser_page_update_prompt
+
 from utils.pdf_util import (
     get_pdf_info,
     extract_pdf_text_from_page,
 )
 
 
+def _load_json_list(raw_text: str) -> List[Dict]:
+    data = json.loads(raw_text)
+    if not isinstance(data, list):
+        raise ValueError("模型输出不是 JSON list")
+    return data
+
 
 async def main_workflow(pdf_path: str) -> Dict:
     pdf_info = get_pdf_info(pdf_path)
     logger.success(f"论文基本信息如下:\n {pdf_info}")
-    parser_messages = []
-    for page in range(1, pdf_info['page_count']+1): # index 从 1 开始
+    pdf_text_list = []
+    for page in tqdm(range(1, pdf_info['page_count']+1), desc="论文文本提取进度..."):
         text = extract_pdf_text_from_page(pdf_path, page)
-        logger.info(f"第 {page} 页文本如下:\n {text}")
-        parser_messages.append({"role": "user", "content": text})
-        cur_section_result = await Runner.run(ParserAgent, parser_messages)
+        pdf_text_list.append(text)
+    logger.success(f"全文页数: {len(pdf_text_list)}")
 
-        parser_messages[-1] = {"role": "user", "content": f"论文第{page}页的关键信息"}
-        parser_messages.append({"role": "assistant", "content": str(cur_section_result.final_output)}) # 这里直接 str 强转, 后续可以考虑优化
-        logger.success(parser_messages)
+    # 第一步: mentor 基于全文提取章节骨架（仅标题，其他字段保持空占位）
+    outline_prompt = mentor_outline_prompt(pdf_text_list)
+    outline_result = await Runner.run(starting_agent=MentorAgent, input=outline_prompt)
+    section_outline = _load_json_list(str(outline_result.final_output))
+    logger.success(f"初始章节骨架: \n{json.dumps(section_outline, ensure_ascii=False, indent=2)}")
 
+    # 第二步: parser 按页补充骨架中的字段
+    for page in tqdm(range(1, pdf_info['page_count'] + 1), desc="论文逐页补充进度..."):
+        page_text = pdf_text_list[page - 1]
+        page_prompt = parser_page_update_prompt(page, page_text, section_outline)
+        page_result = await Runner.run(starting_agent=ParserAgent, input=page_prompt)
+        section_outline = _load_json_list(str(page_result.final_output))
+        logger.success(f"第 {page} 页补充后的章节 JSON 已更新")
 
-        if page == 10: break # attention一共就10页, 目前测试用, 后续删除
-    
-    # ToDo: mentor_agent 调用, 总结全文的解析结果
-    paper_parser_query = f"""
-以页为单位, 论文解析结果如下:
-{parser_messages}
-你需要把这个汇总, 输出一份整体的论文解析结果, 包括论文的章节信息、关键信息、评价和建议等。
-"""
-    paper_parser_result = await Runner.run(mentor_agent, paper_parser_query)
-    logger.success(f"论文解析结果: \n{paper_parser_result.final_output}")
+        if page == 3: break # 调试使用, 后续删除
+
+    logger.success(f"论文解析结果: \n{json.dumps(section_outline, ensure_ascii=False, indent=2)}")
+    return {"response": section_outline}

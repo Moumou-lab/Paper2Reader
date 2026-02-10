@@ -19,13 +19,11 @@ from .config import (
 
 MentorAgent = Agent(
     name="万能专家",
-    instructions=(
-        "你是一个通用型的AI助手，类似团队中的万能人，可以帮助解决各种问题、处理多样化任务。"
-        "你擅长分析、建议、执行，能够根据需要调用工具或自主完成任务。"
-        "请用专业、简明的方式满足用户的多种需求。"
-    ),
+    instructions="""你是一个通用型的AI助手，能够处理多样化任务。
+根据用户的具体要求，完成任务需求。
+""",
     model=base_dpsk_model,
     model_settings=base_dpsk_nothink_setting(),
     output_type=str,
-    tool=[],
+    # tool=[],
 )
