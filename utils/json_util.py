@@ -22,10 +22,3 @@ def update_parser_json(pdf_path: str, section_outline: List[Dict]):
         json.dumps(section_outline, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-
-
-def load_json_list(raw_text: str) -> List[Dict]:
-    data = json.loads(raw_text)
-    if not isinstance(data, list):
-        raise ValueError("模型输出不是 JSON list")
-    return data
