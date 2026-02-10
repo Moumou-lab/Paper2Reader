@@ -1,3 +1,11 @@
+"""
+Mentor Agent 的提示词
+"""
+def mentor_system_prompt() -> str:
+    return """你是一个通用型的AI助手，能够处理多样化任务。
+根据用户的具体要求，完成任务需求。
+"""
+
 def mentor_outline_prompt(pdf_text_list):
     return f"""
 你将收到一篇论文按页提取后的全文文本列表。

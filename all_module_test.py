@@ -8,7 +8,7 @@ from agents import Runner
 
 async def main():
     outline_result = await Runner.run(starting_agent=MentorAgent, input="你好, 一句话介绍一下快手")
-    logger.success(outline_result.final_output)
+    logger.success(outline_result)
 
 if __name__ == "__main__":
     asyncio.run(main())
