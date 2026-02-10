@@ -23,7 +23,8 @@ MentorAgent = Agent(
 根据用户的具体要求，完成任务需求。
 """,
     model=base_dpsk_model,
-    model_settings=base_dpsk_nothink_setting(),
+    # model_settings=base_dpsk_nothink_setting(),
+    model_settings=base_dpsk_think_setting(),
     output_type=str,
     # tool=[],
 )
