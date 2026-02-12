@@ -13,7 +13,7 @@ from .config import (
     base_dpsk_settings,
 )
 from .prompts.parser_prompt import parser_system_prompt
-
+from .tools.tool_schema import TOOL_SCHEMA
 
 class ParserAgent:
     def __init__(
@@ -21,11 +21,12 @@ class ParserAgent:
         model=TEXT_MODEL,
         client=base_client,
         _base_settings=base_dpsk_settings(thinking=False),
+        _tools=TOOL_SCHEMA,
     ):
         self.model = model
         self.client = client
         self._base_settings = _base_settings
-
+        self._tools = _tools # 先传入, 不用, 占个坑
     def call_response(self, input: str|list[dict]) -> Any:
         """
         调用 OpenAI 聊天补全接口并返回单条消息对象。

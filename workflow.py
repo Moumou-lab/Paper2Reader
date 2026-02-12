@@ -40,16 +40,16 @@ async def main_workflow(pdf_path: str) -> Dict:
     logger.success(f"初始章节骨架: \n{json.dumps(section_outline, ensure_ascii=False, indent=2)}")
 
     # 第二步: ParserAgent 按页补充骨架中的字段
-    for page in tqdm(range(1, pdf_info['page_count'] + 1), desc="论文逐页补充进度..."):
+    for page in tqdm(range(1, pdf_info['page_count']), desc="论文逐页补充进度..."):
         section_outline = read_parser_json(pdf_path)
-        page_text = pdf_text_list[page - 1]
+        page_text = pdf_text_list[page - 1] + pdf_text_list[page] # 每次 Concat 两页文本, 确保上下文连续性
         page_prompt = parser_page_update_prompt(page, page_text, section_outline)
         page_result = ParserAgent().call_response(page_prompt).content
         section_outline = json.loads(page_result)
         update_parser_json(pdf_path, section_outline)
         logger.success(f"第 {page} 页补充后的章节 JSON 已更新")
 
-        if page == 2: break # 调试使用, 后续删除
+        if page == 6: break # 调试使用, 后续删除
 
     final_json = read_parser_json(pdf_path)
     logger.success(f"论文解析结果: \n{json.dumps(final_json, ensure_ascii=False, indent=2)}")
