@@ -1,16 +1,8 @@
 # 标准模块导入
 import asyncio
-from agents import (
-    Agent,
-    ModelSettings,
-    OpenAIChatCompletionsModel,
-    Runner,
-    function_tool,
-)
 from loguru import logger
 
 # 自定义模块导入
-from p2r_agents.parser_agent import ParserAgent
 from workflow import main_workflow
 
 

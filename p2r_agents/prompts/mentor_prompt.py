@@ -40,7 +40,8 @@ def mentor_outline_prompt(pdf_text_list):
 2. 除标题外，其他字段必须保持空占位（"" 或 []），不能填内容。
 3. 若某大标题下没有小标题，subsections 必须是 []。
 4. 标题命名尽量贴合论文原文，不要编造。
-5. 只输出合法 JSON 数组，不要输出 Markdown 代码块，不要输出解释文字。
+5. 章节骨架不需要包含Reference章节
+6. 只输出合法 JSON 数组，不要输出 Markdown 代码块，不要输出解释文字。
 
 【输入全文】
 {pdf_text_list}

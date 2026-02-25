@@ -32,7 +32,7 @@ PDF 输入
   ↓
 [2] MentorAgent 提取章节骨架（标题结构）
   ↓
-[3] ParserAgent 逐页补充内容（上下文连续）
+[3] ParserAgent 工具化逐页召回目标 Sections 更新
   ↓
 [4] 生成结构化 JSON（章节 + 子章节 + 内容）
   ↓
@@ -45,13 +45,15 @@ PDF 输入
 
 ### 1. 智能体模块 (`p2r_agents/`)
 - `mentor_agent.py`：通用 AI 助手，处理全局任务
-- `parser_agent.py`：论文解析专家，结构化提取
+- `parser_agent.py`：论文解析专家，支持工具调用循环（Function Calling + 回写）
 - `testing_agent.py`：工具调用测试，支持 Function Calling 循环
 - `config.py`：统一的模型与 API 配置
 
 ### 2. 工具系统 (`p2r_agents/tools/`)
 - `tool_schema.py`：工具函数的 JSON Schema 定义
-- `parser_tool.py`：章节召回与更新工具实现
+- `parser_tool.py`：
+  - `tool_recall_sections`：按标题召回顶层 section 完整 parser（命中 subsection 也返回所属顶层）
+  - `tool_update_sections`：按顶层 `section_title` 匹配并回写更新结果
 
 ### 3. 提示词管理 (`p2r_agents/prompts/`)
 - `mentor_prompt.py`：MentorAgent 的系统提示词
@@ -80,12 +82,14 @@ python main.py
 # 测试 MentorAgent
 python -m p2r_agents.mentor_agent
 
-# 测试 ParserAgent
-python -m p2r_agents.parser_agent
-
 # 测试 TestingAgent（工具调用）
 python -m p2r_agents.testing_agent
 ```
+
+### 当前关键约定（已实现）
+- 模型侧不感知 `pdf_path`，避免 prompt 污染。
+- `pdf_path` 由 Agent 运行时注入到工具参数中（宿主代码注入上下文）。
+- `parser_paper.json` 仍按 `outputs/{paper_name}/parser_paper.json` 管理。
 
 ---
 
@@ -93,7 +97,7 @@ python -m p2r_agents.testing_agent
 
 - [x] PDF 文本提取模块
 - [x] MentorAgent 章节骨架提取
-- [x] ParserAgent 逐页内容补充
+- [x] ParserAgent 工具化逐页补充（召回 + 回写）
 - [x] 工具调用系统（Function Calling）
 - [x] 结构化 JSON 输出
 - [ ] 图表提取与解析
@@ -110,7 +114,7 @@ python -m p2r_agents.testing_agent
 ```python
 BASE_URL = "https://api.siliconflow.cn/v1"
 API_KEY = "your-api-key"  # 建议通过环境变量设置
-TEXT_MODEL = "deepseek-ai/DeepSeek-V3.2"
+TEXT_MODEL = "Pro/deepseek-ai/DeepSeek-V3.2"
 ```
 
 ---
