@@ -6,6 +6,8 @@ from typing import List, Dict, Any, Optional
 
 from utils.json_util import read_parser_json, update_parser_json
 
+def _norm(s: str) -> str:
+    return " ".join((s or "").strip().lower().split())
 
 def tool_recall_sections(
     titles: List[str],
@@ -24,11 +26,8 @@ def tool_recall_sections(
     if not isinstance(outline, list):
         return []
 
-    def norm(s: str) -> str:
-        return " ".join((s or "").strip().lower().split())
-
     def title_matched(s: str, ask_list: List[str]) -> bool:
-        s_norm = norm(s)
+        s_norm = _norm(s)
         return any(ask in s_norm or s_norm in ask for ask in ask_list)
 
     def has_match_in_tree(node: Dict[str, Any], ask_list: List[str]) -> bool:
@@ -40,7 +39,7 @@ def tool_recall_sections(
         return False
 
     results = []
-    ask_set = [norm(t) for t in titles]
+    ask_set = [_norm(t) for t in titles]
     for sec in outline:
         if has_match_in_tree(sec, ask_set):
             results.append(sec)
@@ -69,13 +68,10 @@ def tool_update_sections(
     if not isinstance(outline, list):
         return {"success": False, "updated_count": 0, "appended_count": 0}
 
-    def norm(s: str) -> str:
-        return " ".join((s or "").strip().lower().split())
-
     incoming_map: Dict[str, Dict[str, Any]] = {}
     for sec in updated_sections:
         if isinstance(sec, dict):
-            key = norm(sec.get("section_title", ""))
+            key = _norm(sec.get("section_title", ""))
             if key:
                 incoming_map[key] = sec
 
@@ -84,7 +80,7 @@ def tool_update_sections(
     used_keys = set()
 
     for sec in outline:
-        key = norm(sec.get("section_title", ""))
+        key = _norm(sec.get("section_title", ""))
         if key in incoming_map:
             new_outline.append(incoming_map[key])
             used_keys.add(key)

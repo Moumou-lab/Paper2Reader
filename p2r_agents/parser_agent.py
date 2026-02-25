@@ -41,7 +41,6 @@ class ParserAgent:
         调用 OpenAI 聊天补全接口，自动处理工具调用循环。
         Args:
             input (str | list[dict])
-            pdf_path (str | None): 当前论文路径（可选，优先级高于实例默认值）
         Returns:
             Any: OpenAI 返回的最终消息对象（文本回复）
         """

@@ -51,3 +51,5 @@ async def main_workflow(pdf_path: str) -> Dict:
 
     final_json = read_parser_json(pdf_path)
     logger.success(f"论文解析结果: \n{json.dumps(final_json, ensure_ascii=False, indent=2)}")
+    # 第三部: 生成报告
+    
