@@ -21,6 +21,7 @@ Paper2Reader 旨在帮助研究生高效准备组会报告。输入 PDF 格式�
 |--------|------|------|
 | **MentorAgent** | 通用任务处理，章节骨架提取 | 基础 LLM 能力，全文理解 |
 | **ParserAgent** | 论文逐页精细解析 | 结构化输出，增量更新 |
+| **ComposeAgent** | 基于 `parser_paper` 生成组会 Markdown 报告 | 面向汇报场景的结构化写作 |
 | **TestingAgent** | 工具调用测试与验证 | 支持 Function Calling |
 
 ### 工作流程
@@ -36,7 +37,7 @@ PDF 输入
   ↓
 [4] 生成结构化 JSON（章节 + 子章节 + 内容）
   ↓
-[5] 渲染报告（计划中... 设计 RAG Tool-Calling）
+[5] ComposeAgent 基于 parser_paper 生成 Markdown 报告（`report.md`）
 ```
 
 ---
@@ -46,6 +47,7 @@ PDF 输入
 ### 1. 智能体模块 (`p2r_agents/`)
 - `mentor_agent.py`：通用 AI 助手，处理全局任务
 - `parser_agent.py`：论文解析专家，支持工具调用循环（Function Calling + 回写）
+- `compose_agent.py`：报告写作助手，基于 `parser_paper` 生成 Markdown
 - `testing_agent.py`：工具调用测试，支持 Function Calling 循环
 - `config.py`：统一的模型与 API 配置
 
@@ -58,6 +60,7 @@ PDF 输入
 ### 3. 提示词管理 (`p2r_agents/prompts/`)
 - `mentor_prompt.py`：MentorAgent 的系统提示词
 - `parser_prompt.py`：ParserAgent 的任务提示词
+- `compose_prompt.py`：ComposeAgent 的系统提示词与报告任务提示词
 
 ### 4. 工具函数 (`utils/`)
 - `pdf_util.py`：PDF 信息提取、文本解析
@@ -90,6 +93,7 @@ python -m p2r_agents.testing_agent
 - 模型侧不感知 `pdf_path`，避免 prompt 污染。
 - `pdf_path` 由 Agent 运行时注入到工具参数中（宿主代码注入上下文）。
 - `parser_paper.json` 仍按 `outputs/{paper_name}/parser_paper.json` 管理。
+- `workflow.py` 最后一步会生成 `outputs/{paper_name}/report.md`。
 
 ---
 
@@ -100,9 +104,10 @@ python -m p2r_agents.testing_agent
 - [x] ParserAgent 工具化逐页补充（召回 + 回写）
 - [x] 工具调用系统（Function Calling）
 - [x] 结构化 JSON 输出
+- [x] Markdown 报告生成（ComposeAgent）
 - [ ] 图表提取与解析
-- [ ] Markdown/PPT 报告渲染
-- [ ] 交互式问答优化
+- [ ] PPT 报告渲染
+- [ ] 交互式问答优化, ToolCallling Retrieval 补充对点目标信息
 - [ ] 多轮对话记忆管理
 
 ---
@@ -125,4 +130,4 @@ MIT License
 
 ---
 
-**Status**: 🚧 Building...
+**Status**: 🚧 Parsing + Markdown Reporting 已打通，持续迭代中

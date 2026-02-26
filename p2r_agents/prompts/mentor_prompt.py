@@ -1,11 +1,13 @@
 """
 Mentor Agent 的提示词
 """
+# **SYSTEM**: 通用系统提示词
 def mentor_system_prompt() -> str:
     return """你是一个通用型的AI助手，能够处理多样化任务。
 根据用户的具体要求，完成任务需求。
 """
 
+# **SKILL**: 章节骨架提取提示词
 def mentor_outline_prompt(pdf_text_list):
     return f"""
 你将收到一篇论文按页提取后的全文文本列表。
@@ -17,17 +19,17 @@ def mentor_outline_prompt(pdf_text_list):
 顶层必须是 JSON 数组，每个元素代表一个大标题章节，字段如下：
 {{
   "section_title": "章节标题",
-  "section_content": "内容",
+  "section_content": "",
   "main_contributions": [],
-  "methodology": "方法论",
+  "methodology": "",
   "experiments": [],
   "conclusions": [],
   "subsections": [
     {{
       "section_title": "小标题",
-      "section_content": "内容",
+      "section_content": "",
       "main_contributions": [],
-      "methodology": "方法论",
+      "methodology": "",
       "experiments": [],
       "conclusions": [],
       "subsections": []
@@ -40,7 +42,7 @@ def mentor_outline_prompt(pdf_text_list):
 2. 除标题外，其他字段必须保持空占位（"" 或 []），不能填内容。
 3. 若某大标题下没有小标题，subsections 必须是 []。
 4. 标题命名尽量贴合论文原文，不要编造。
-5. 章节骨架不需要包含Reference章节
+5. 章节骨架不需要包含 Reference 章节。
 6. 只输出合法 JSON 数组，不要输出 Markdown 代码块，不要输出解释文字。
 
 【输入全文】

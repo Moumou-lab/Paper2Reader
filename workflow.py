@@ -8,10 +8,12 @@ from tqdm import tqdm
 from p2r_agents import (
     MentorAgent,
     ParserAgent,
+    ComposeAgent,
 )
 from p2r_agents.prompts import (
     mentor_outline_prompt, 
     parser_page_update_prompt,
+    compose_report_prompt,
 )
 from utils.pdf_util import (
     get_pdf_info,
@@ -46,10 +48,19 @@ async def main_workflow(pdf_path: str) -> Dict:
         page_prompt = parser_page_update_prompt(page, page_text)
         page_result = parser_agent.call_response(page_prompt).content
         logger.success(f"第 {page} 页处理完成: {page_result}")
-
         if page == 6: break # 调试使用, 后续删除
 
     final_json = read_parser_json(pdf_path)
     logger.success(f"论文解析结果: \n{json.dumps(final_json, ensure_ascii=False, indent=2)}")
-    # 第三部: 生成报告
+
+    # 第三步: ComposeAgent 基于 parser_paper 生成 Markdown 报告
+    compose_agent = ComposeAgent(current_pdf_path=pdf_path)
+    compose_prompt = compose_report_prompt(final_json)
+    compose_result = compose_agent.call_response(compose_prompt)
+    report_md = compose_result.content if compose_result and compose_result.content else ""
+
+    report_path = Path("outputs") / Path(pdf_path).stem / "report.md"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(report_md, encoding="utf-8")
+    logger.success(f"组会报告已生成, 报告路径: {report_path}")
     
