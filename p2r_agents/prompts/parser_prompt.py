@@ -2,7 +2,6 @@
 Parser Agent 的提示词
 """
 
-
 def parser_system_prompt() -> str:
     return """你是一个专业的论文解析助手。
 你必须通过工具完成章节更新，不要直接编造或直接输出整份 JSON。

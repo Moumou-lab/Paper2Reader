@@ -9,6 +9,7 @@ from workflow import main_workflow
 async def main():
     logger.info("开始执行 main 函数")
     PDF_PATH = "papers/DSSM.pdf"
+    # PDF_PATH = "papers/attention.pdf"
     await main_workflow(PDF_PATH)
 
 if __name__ == "__main__":
