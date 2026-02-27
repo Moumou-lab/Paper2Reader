@@ -63,7 +63,7 @@ async def main_workflow(pdf_path: str) -> Dict:
         page_prompt = parser_page_update_prompt(page, page_text)
         page_result = parser_agent.call_response(page_prompt).content
         logger.success(f"第 {page} 页处理完成: {page_result}")
-        # if page == 6: break # 调试使用, 后续删除
+        if page == 40: break # 调试使用, 后续删除
 
     final_json = read_parser_json(pdf_path)
     logger.success(f"论文解析结果: \n{json.dumps(final_json, ensure_ascii=False, indent=2)}")
